@@ -1,0 +1,181 @@
+!
+version 15.1
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname RouterD
+!
+!
+!
+!
+ip dhcp excluded-address 10.80.180.241 10.80.180.242
+ip dhcp excluded-address 10.80.180.241 10.80.180.243
+ip dhcp excluded-address 10.80.180.193
+ip dhcp excluded-address 10.80.180.129
+ip dhcp excluded-address 10.80.180.1
+ip dhcp excluded-address 10.80.180.225
+!
+ip dhcp pool RouterDDHCP
+ network 10.80.180.240 255.255.255.240
+ default-router 10.80.180.241
+ dns-server 10.80.180.243
+ip dhcp pool DPiso0
+ network 10.80.180.192 255.255.255.224
+ default-router 10.80.180.193
+ dns-server 10.80.180.242
+ip dhcp pool DPiso1
+ network 10.80.180.128 255.255.255.192
+ default-router 10.80.180.129
+ dns-server 10.80.180.242
+ip dhcp pool DWiFi
+ network 10.80.180.0 255.255.255.128
+ default-router 10.80.180.1
+ dns-server 10.80.180.242
+ip dhcp pool DVoIP
+ network 10.80.180.224 255.255.255.240
+ default-router 10.80.180.225
+ option 150 ip 10.80.180.225
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+!
+!
+!
+license udi pid CISCO2811/K9 sn FTX1017NMC5-
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface FastEthernet0/0
+ no ip address
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/0.44
+ no ip address
+!
+interface FastEthernet0/0.445
+ encapsulation dot1Q 445
+ ip address 10.80.180.193 255.255.255.224
+ ip nat inside
+!
+interface FastEthernet0/0.446
+ encapsulation dot1Q 446
+ ip address 10.80.180.129 255.255.255.192
+ ip nat inside
+!
+interface FastEthernet0/0.447
+ encapsulation dot1Q 447
+ ip address 10.80.180.1 255.255.255.128
+ ip nat inside
+!
+interface FastEthernet0/0.448
+ encapsulation dot1Q 448
+ ip address 10.80.180.241 255.255.255.240
+ ip nat inside
+!
+interface FastEthernet0/0.449
+ encapsulation dot1Q 449
+ ip address 10.80.180.225 255.255.255.240
+ ip nat inside
+!
+interface FastEthernet0/1
+ no ip address
+ duplex auto
+ speed auto
+ shutdown
+!
+interface FastEthernet1/0
+ ip address 10.80.183.4 255.255.255.0
+ ip nat outside
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+router ospf 4
+ log-adjacency-changes
+ network 10.80.183.0 0.0.0.255 area 0
+ network 10.80.180.192 0.0.0.31 area 4
+ network 10.80.180.128 0.0.0.63 area 4
+ network 10.80.180.240 0.0.0.15 area 4
+ network 10.80.180.224 0.0.0.15 area 4
+ network 10.80.180.0 0.0.0.15 area 4
+!
+ip nat inside source list 1 interface FastEthernet0/0.445 overload
+ip nat inside source list 2 interface FastEthernet0/0.446 overload
+ip nat inside source list 3 interface FastEthernet0/0.447 overload
+ip nat inside source list 4 interface FastEthernet0/0.448 overload
+ip nat inside source list 5 interface FastEthernet0/0.449 overload
+ip nat inside source static tcp 10.80.180.242 80 10.80.183.4 80 
+ip nat inside source static tcp 10.80.180.242 443 10.80.183.4 443 
+ip nat inside source static tcp 10.80.180.243 53 10.80.183.4 53 
+ip classless
+ip route 0.0.0.0 0.0.0.0 10.80.183.6 
+!
+ip flow-export version 9
+!
+!
+access-list 1 permit 10.80.180.240 0.0.0.15
+access-list 2 permit 10.80.180.240 0.0.0.15
+access-list 3 permit 10.80.180.240 0.0.0.15
+access-list 4 permit 10.80.180.32 0.0.0.15
+access-list 5 permit 10.80.180.240 0.0.0.15
+!
+!
+!
+!
+!
+telephony-service
+ max-ephones 3
+ max-dn 3
+ ip source-address 10.80.180.225 port 2000
+ auto assign 1 to 3
+!
+ephone-dn 1
+ number 6000
+!
+ephone-dn 2
+ number 6001
+!
+ephone 1
+ device-security-mode none
+ mac-address 00D0.BC5B.D0CC
+ type 7960
+ button 1:1
+!
+ephone 2
+ device-security-mode none
+ mac-address 0090.2B6E.C2D5
+ type 7960
+ button 1:2
+!
+line con 0
+!
+line aux 0
+!
+line vty 0 4
+ login
+!
+!
+!
+end
+

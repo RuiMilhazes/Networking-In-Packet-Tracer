@@ -1,0 +1,214 @@
+!
+version 15.1
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname RouterB
+!
+!
+!
+!
+ip dhcp excluded-address 10.80.178.241
+ip dhcp excluded-address 10.80.178.241 10.80.178.243
+ip dhcp excluded-address 10.80.178.241 10.80.178.242
+ip dhcp excluded-address 10.80.178.225
+ip dhcp excluded-address 10.80.178.193
+ip dhcp excluded-address 10.80.178.129
+ip dhcp excluded-address 10.80.178.1
+ip dhcp excluded-address 10.80.178.22
+!
+ip dhcp pool RouterBDHCP
+ network 10.80.178.240 255.255.255.240
+ default-router 10.80.178.241
+ dns-server 10.80.178.243
+ip dhcp pool VOIPB
+ network 10.80.178.224 255.255.255.240
+ default-router 10.80.178.225
+ option 150 ip 10.80.178.225
+ip dhcp pool BPiso0
+ network 10.80.178.192 255.255.255.224
+ default-router 10.80.178.193
+ dns-server 10.80.178.242
+ip dhcp pool BPiso1
+ network 10.80.178.128 255.255.255.192
+ default-router 10.80.178.129
+ dns-server 10.80.178.242
+ip dhcp pool BWiFi
+ network 10.80.178.0 255.255.255.128
+ default-router 10.80.178.1
+ dns-server 10.80.178.242
+ip dhcp pool BVoIP
+ network 10.80.178.224 255.255.255.240
+ default-router 10.80.178.225
+ option 150 ip 10.80.178.225
+ dns-server 10.80.178.242
+!
+!
+!
+no ip cef
+no ipv6 cef
+!
+!
+!
+!
+license udi pid CISCO2811/K9 sn FTX1017RQK7-
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface FastEthernet0/0
+ no ip address
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/0.435
+ encapsulation dot1Q 435
+ ip address 10.80.178.193 255.255.255.224
+ ip nat inside
+!
+interface FastEthernet0/0.436
+ encapsulation dot1Q 436
+ ip address 10.80.178.129 255.255.255.192
+ ip nat inside
+!
+interface FastEthernet0/0.437
+ encapsulation dot1Q 437
+ ip address 10.80.178.1 255.255.255.128
+ ip nat inside
+!
+interface FastEthernet0/0.438
+ encapsulation dot1Q 438
+ ip address 10.80.178.241 255.255.255.240
+ ip nat inside
+!
+interface FastEthernet0/0.439
+ encapsulation dot1Q 439
+ ip address 10.80.178.225 255.255.255.240
+ ip nat inside
+!
+interface FastEthernet0/1
+ no ip address
+ duplex auto
+ speed auto
+ shutdown
+!
+interface FastEthernet1/0
+ ip address 10.80.183.2 255.255.255.0
+ ip nat outside
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+router ospf 2
+ log-adjacency-changes
+ network 10.80.183.0 0.0.0.255 area 0
+ network 10.80.178.128 0.0.0.63 area 2
+ network 10.80.178.192 0.0.0.31 area 2
+ network 10.80.178.0 0.0.0.127 area 2
+ network 10.80.178.224 0.0.0.15 area 2
+ network 10.80.178.240 0.0.0.15 area 2
+!
+router ospf 5
+ log-adjacency-changes
+!
+router rip
+!
+ip nat inside source list 1 interface FastEthernet0/0.435 overload
+ip nat inside source list 2 interface FastEthernet0/0.436 overload
+ip nat inside source list 3 interface FastEthernet0/0.437 overload
+ip nat inside source list 4 interface FastEthernet0/0.438 overload
+ip nat inside source list 5 interface FastEthernet0/0.439 overload
+ip nat inside source static tcp 10.80.178.242 80 10.80.183.2 80 
+ip nat inside source static tcp 10.80.178.242 443 10.80.183.2 443 
+ip nat inside source static tcp 10.80.178.243 53 10.80.183.2 53 
+ip nat inside source static tcp 10.80.178.242 80 10.80.183.1 80 
+ip nat inside source static tcp 10.80.178.242 443 10.80.183.1 443 
+ip nat inside source static tcp 10.80.178.243 53 10.80.183.1 53 
+ip classless
+ip route 0.0.0.0 0.0.0.0 10.80.183.6 
+!
+ip flow-export version 9
+!
+!
+access-list 1 permit 10.80.178.240 0.0.0.15
+access-list 2 permit 10.80.178.240 0.0.0.15
+access-list 3 permit 10.80.178.240 0.0.0.15
+access-list 4 permit 10.80.178.240 0.0.0.15
+access-list 5 permit 10.80.178.240 0.0.0.15
+!
+!
+!
+!
+!
+telephony-service
+ max-ephones 5
+ max-dn 5
+ ip source-address 10.80.178.225 port 2000
+ auto assign 1 to 5
+!
+ephone-dn 1
+ number 3000
+!
+ephone-dn 2
+ number 3001
+!
+ephone-dn 3
+ number 3002
+!
+ephone-dn 4
+ number 3003
+!
+ephone-dn 5
+ number 3004
+!
+ephone 1
+ device-security-mode none
+ mac-address 000C.CFC0.EBDC
+ type 7960
+ button 1:1
+!
+ephone 2
+ device-security-mode none
+ mac-address 00D0.FF19.6BE6
+ type 7960
+ button 1:2
+!
+ephone 3
+ device-security-mode none
+ mac-address 0002.1778.5D4E
+ type 7960
+ button 1:3
+!
+ephone 4
+ device-security-mode none
+ mac-address 0000.0C92.2272
+ type 7960
+ button 1:4
+!
+line con 0
+!
+line aux 0
+!
+line vty 0 4
+ login
+!
+!
+!
+end
+
